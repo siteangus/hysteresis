@@ -61,13 +61,14 @@ else:
 # Calculate coercivity and remanence
 magnetisation_array = np.array(magnetisation)
 H_zero_crossing = H_input[np.argmin(np.abs(magnetisation_array))]
-M_at_H_zero = np.interp(0, H_input, magnetisation_array)
+M_at_H_zero = magnetisation_array[np.abs(H_input).argmin()]
 
 # Plotting
 fig, ax = plt.subplots()
 ax.plot(H_input, magnetisation, color='blue', label="Magnetisation")
 ax.axvline(x=H_zero_crossing, color='red', linestyle='--', label=f"Coercivity ≈ {H_zero_crossing:.2f}")
 ax.axhline(y=M_at_H_zero, color='green', linestyle='--', label=f"Remanence ≈ {M_at_H_zero:.2f}")
+
 ax.set_xlabel("Magnetic Field H")
 ax.set_ylabel("Magnetisation M")
 ax.set_title("Preisach Hysteresis Loop")
