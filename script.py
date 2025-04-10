@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import time
 
 st.set_page_config(page_title="Preisach Hysteresis Model", layout="centered")
-st.title("📉 Preisach Hysteresis Model Explorer")
+st.title(" Preisach Hysteresis Model ")
 
 st.markdown("""
 This interactive model shows a simplified version of the **Preisach hysteresis model**.
@@ -32,7 +32,12 @@ alphas = coercive_fields
 betas = -coercive_fields
 
 states = -np.ones(num_hysterons)
-magnetisation = []
+
+# Clip the magnetization to saturation levels
+saturation_magnetisation_pos = saturation_magnetisation
+saturation_magnetisation_neg = -saturation_magnetisation
+
+magnetisation = []  # To store magnetization values
 
 if animate:
     chart = st.line_chart()
@@ -44,6 +49,8 @@ if animate:
             elif H <= betas[i]:
                 states[i] = -1
         M = np.sum(states) / num_hysterons * saturation_magnetisation
+        # Clip magnetization to saturation limits
+        M = np.clip(M, saturation_magnetisation_neg, saturation_magnetisation_pos)
         temp_magnetisation.append(M)
         chart.add_rows({"Magnetisation": [M]})
         time.sleep(0.01)
@@ -56,11 +63,17 @@ else:
             elif H <= betas[i]:
                 states[i] = -1
         M = np.sum(states) / num_hysterons * saturation_magnetisation
+        # Clip magnetization to saturation limits
+        M = np.clip(M, saturation_magnetisation_neg, saturation_magnetisation_pos)
         magnetisation.append(M)
 
 # Calculate coercivity and remanence
 magnetisation_array = np.array(magnetisation)
+
+# Coercivity - where magnetisation crosses zero
 H_zero_crossing = H_input[np.argmin(np.abs(magnetisation_array))]
+
+# Remanence - magnetisation at H = 0
 M_at_H_zero = magnetisation_array[np.abs(H_input).argmin()]
 
 # Plotting
@@ -77,7 +90,7 @@ ax.legend()
 
 st.pyplot(fig)
 
-st.markdown("### ℹ️ Notes")
+st.markdown("### Notes")
 st.markdown(f"""
 - **Coercivity (Hc)**: The field where magnetisation crosses zero ≈ `{H_zero_crossing:.2f}`
 - **Remanence (Mr)**: The residual magnetisation at `H = 0` ≈ `{M_at_H_zero:.2f}`
